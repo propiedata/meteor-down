@@ -16,11 +16,10 @@
   "author": "Meteorhacks",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "1.21.x"
+    "mocha": "^9.2.2"
   },
   "dependencies": {
-    "ddp": "0.10.x",
-    "underscore": "1.7.x",
-    "coffee-script": "1.9.x"
+    "ddp": "^0.12.1",
+    "underscore": "^1.13.2"
   }
 }
