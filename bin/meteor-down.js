@@ -4,29 +4,26 @@
 // we don't need pooling here
 require('http').globalAgent.maxSockets = 999999;
 
-var vm = require('vm');
-var _ = require('underscore');
-var fs = require('fs');
-var util = require('util');
-var MeteorDown = require('../');
-var coffee = require( "coffee-script" )
+const vm = require('vm');
+const fs = require('fs');
 
-var filePath = process.argv[2];
-if(!filePath) {
+const MeteorDownClient = require('../lib/mdown')
+
+
+const filePath = process.argv[2];
+
+if (!filePath) {
   showHelp();
   process.exit(1);
 }
 
-var meteorDown = new MeteorDown();
+const meteorDown = new MeteorDownClient();
 
-// run the script
-var content = fs.readFileSync(filePath).toString();
+const content = fs.readFileSync(filePath).toString();
 
-if( filePath.substr(-6) == 'coffee' ) content = coffee.compile( content );
-
-var context = {
-  require: require,
-  meteorDown: meteorDown
+const context = {
+  require,
+  meteorDown
 };
 
 // important: getOwnPropertyNames can get both enumerables and non-enumerables
@@ -41,11 +38,11 @@ vm.runInNewContext(content, context);
 setInterval(function () {
   printStats(meteorDown.stats.get());
   meteorDown.stats.reset();
-}, 1000*5);
+}, 1000 * 5);
 
 /* ------------------------------------------------------------------------- */
 
-function showHelp () {
+function showHelp() {
   // TODO improve help and CLI interface
   console.log(
     'USAGE:\n'+
@@ -53,18 +50,20 @@ function showHelp () {
   );
 }
 
-function printStats (stats) {
-  var duration = stats.end - stats.start;
+function printStats(stats) {
+  const duration = stats.end - stats.start;
 
   console.log('--------------------------------------------------')
   console.log('Time   : %s', stats.end.toLocaleString());
 
-  if(stats.data['method-response-time']) {
-    var methodSummary = stats.data['method-response-time'].summary;
-    var methodBreakdown = stats.data['method-response-time'].breakdown;
+  if (stats.data['method-response-time']) {
+    const methodSummary = stats.data['method-response-time'].summary;
+    const methodBreakdown = stats.data['method-response-time'].breakdown;
+
     console.log('Method : average: %d/min %dms ',
       parseInt(methodSummary.count * 60000 / duration),
       parseInt(methodSummary.total / methodSummary.count));
+
     methodBreakdown.forEach(function (item) {
       console.log('         %s: %d/min %dms', item.name,
         parseInt(item.count * 60000 / duration),
@@ -72,12 +71,14 @@ function printStats (stats) {
     });
   }
 
-  if(stats.data['pubsub-response-time']) {
-    var pubsubSummary = stats.data['pubsub-response-time'].summary;
-    var pubsubBreakdown = stats.data['pubsub-response-time'].breakdown;
+  if (stats.data['pubsub-response-time']) {
+    const pubsubSummary = stats.data['pubsub-response-time'].summary;
+    const pubsubBreakdown = stats.data['pubsub-response-time'].breakdown;
+
     console.log('PubSub : average: %d/min %dms ',
       parseInt(pubsubSummary.count * 60000 / duration),
       parseInt(pubsubSummary.total / pubsubSummary.count));
+
     pubsubBreakdown.forEach(function (item) {
       console.log('         %s: %d/min %dms', item.name,
         parseInt(item.count * 60000 / duration),
